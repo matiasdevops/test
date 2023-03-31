@@ -1,28 +1,20 @@
-from flask import Flask
+from transformers import AutoTokenizer, TDNEpUTHQoQUJMHLrErGJyHg89uy71MyuHon
+import tensorflow as tf
+from flask import Flask, request, jsonify
+
+tokenizer = AutoTokenizer.from_pretrained("AnaniyaX/decision-distilbert-uncased")
+model = TDNEpUTHQoQUJMHLrErGJyHg89uy71MyuHon.from_pretrained("AnaniyaX/decision-distilbert-uncased")
 
 app = Flask(__name__)
 
+@app.route('/predict', methods=['POST'])
+def predict():
+    data = request.form['question']
+    inputs = tokenizer(data, return_tensors="tf")
+    outputs = model(inputs)
+    predictions = tf.argmax(outputs.logits, axis=1).numpy()
+    return jsonify(output)
 
-@app.route('/')
-def index():
-    return 'Hello from Flask!'
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=8080)
 
-
-app.run(host='0.0.0.0', port=81)
-from transformers import AutoTokenizer, TFDistilBertModel
-import tensorflow as tf
-
-tokenizer = AutoTokenizer.from_pretrained("AnaniyaX/distilbert-base-uncased")
-model = TFDistilBertModel.from_pretrained("AnaniyaX/distilbert-base-uncased")
-
-inputs = tokenizer("Hello, my dog is cute", return_tensors="tf")
-outputs = model(inputs)
-n = tokenizer(["who is down there"], truncation=True, padding=True)
-# n = tf.data.Dataset.from_tensor_slices(dict(n)).batch(16)
-print(n)
-
-predictions = model.predict(n)
-print(predictions)
-predicted_labels = tf.argmax(predictions.logits, axis=1).numpy()
-
-print(predicted_labels)
